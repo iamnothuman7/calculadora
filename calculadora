@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Economia - Ibiapaba Solar</title>
+    <style>
+        :root {
+            --primary: #2E8B57;
+            --primary-dark: #1F6B41;
+            --secondary: #FFD700;
+            --light: #F8F9FA;
+            --dark: #343A40;
+            --success: #28A745;
+            --warning: #FFC107;
+            --danger: #DC3545;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 1rem;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .calculator-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        
+        .card-header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .card-body {
+            padding: 2rem;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .input-group {
+            display: flex;
+            align-items: center;
+        }
+        
+        .input-group-prepend {
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+            border-right: none;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.25rem 0 0 0.25rem;
+            color: var(--dark);
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            font-size: 1rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(46, 139, 87, 0.25);
+        }
+        
+        .input-group input {
+            border-radius: 0 0.25rem 0.25rem 0;
+        }
+        
+        .btn {
+            display: inline-block;
+            font-weight: 600;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            user-select: none;
+            border: 1px solid transparent;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            border-radius: 0.25rem;
+            transition: all 0.15s ease-in-out;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            color: white;
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        .results {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            display: none;
+        }
+        
+        .results.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .result-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            border-top: 4px solid var(--primary);
+        }
+        
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+            color: var(--primary);
+        }
+        
+        .result-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .savings-breakdown {
+            margin-top: 1.5rem;
+        }
+        
+        .savings-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .savings-item:last-child {
+            border-bottom: none;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+        
+        .comparison-chart {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .chart-bars {
+            display: flex;
+            align-items: flex-end;
+            height: 200px;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+        
+        .chart-bar {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .bar {
+            width: 100%;
+            border-radius: 4px 4px 0 0;
+            transition: height 0.5s ease-in-out;
+        }
+        
+        .bar-sem-gd {
+            background-color: var(--danger);
+        }
+        
+        .bar-com-gd {
+            background-color: var(--success);
+        }
+        
+        .bar-label {
+            margin-top: 0.5rem;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .preset-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .preset-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 0.6rem 1rem;
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: all 0.15s ease-in-out;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .preset-btn:hover {
+            background-color: #dae0e5;
+        }
+        
+        .preset-btn.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .info-box {
+            background-color: #e7f3ff;
+            border-left: 4px solid #007bff;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .tarifa-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .tarifa-item {
+            text-align: center;
+            padding: 0.5rem;
+        }
+        
+        .tarifa-valor {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .tarifa-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: #6c757d;
+            font-size: 0.9rem;
+            border-top: 1px solid #e9ecef;
+            margin-top: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .preset-buttons {
+                flex-direction: column;
+            }
+            
+            .tarifa-info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <div class="logo-icon">☀️</div>
+                <div>
+                    <h1>Calculadora de Economia</h1>
+                    <p class="subtitle">Associação Ibiapaba Solar - Energia Compartilhada</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="calculator-card">
+            <div class="card-header">
+                <h2>Simule sua economia com energia solar compartilhada</h2>
+                <p>Baseado nas tarifas da Enel CE - Simule usando o valor da sua conta</p>
+            </div>
+            <div class="card-body">
+                <div class="info-box">
+                    <strong>Como funciona:</strong> Insira o valor médio da sua conta de luz da Enel. 
+                    Nossa calculadora estima automaticamente seu consumo e mostra quanto você pode economizar 
+                    com a energia solar compartilhada da Associação Ibiapaba Solar.
+                </div>
+                
+                <div class="tarifa-info">
+                    <div class="tarifa-item">
+                        <div class="tarifa-valor">R$ 0,97272</div>
+                        <div class="tarifa-label">Tarifa Enel CE<br>Mercado Cativo</div>
+                    </div>
+                    <div class="tarifa-item">
+                        <div class="tarifa-valor">R$ 0,73925</div>
+                        <div class="tarifa-label">Tarifa Enel CE<br>Geração Distribuída</div>
+                    </div>
+                    <div class="tarifa-item">
+                        <div class="tarifa-valor">27.000 kWh</div>
+                        <div class="tarifa-label">Capacidade da<br>Nossa Usina</div>
+                    </div>
+                </div>
+                
+                <div class="preset-buttons">
+                    <div class="preset-btn" data-valor-conta="350">Residência Pequena<br>~R$ 350/mês</div>
+                    <div class="preset-btn" data-valor-conta="600">Residência Média<br>~R$ 600/mês</div>
+                    <div class="preset-btn active" data-valor-conta="1100">Residência Grande<br>~R$ 1.100/mês</div>
+                    <div class="preset-btn" data-valor-conta="2500">Pequeno Comércio<br>~R$ 2.500/mês</div>
+                    <div class="preset-btn" data-valor-conta="5000">Médio Comércio<br>~R$ 5.000/mês</div>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="valor-conta">Valor Médio da Sua Conta ENEL (R$)</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">R$</div>
+                            <input type="number" id="valor-conta" min="100" max="50000" step="10" value="1100">
+                        </div>
+                        <small style="color: #6c757d;">Insira o valor médio que você paga à Enel</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tipo-ligacao">Tipo de Ligação</label>
+                        <select id="tipo-ligacao">
+                            <option value="30">Monofásica</option>
+                            <option value="50">Bifásica</option>
+                            <option value="100" selected>Trifásica</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="percentual-cip">Percentual Aprox. da CIP (%)</label>
+                        <div class="input-group">
+                            <input type="number" id="percentual-cip" min="5" max="20" step="0.1" value="12.6">
+                            <div class="input-group-prepend">%</div>
+                        </div>
+                        <small style="color: #6c757d;">Geralmente entre 10-15% do valor da conta</small>
+                    </div>
+                </div>
+                
+                <button id="calcular" class="btn btn-primary btn-block">Calcular Minha Economia</button>
+                
+                <div id="results" class="results">
+                    <h3>Resultado da Simulação</h3>
+                    
+                    <div class="results-grid">
+                        <div class="result-card">
+                            <div class="result-label">Economia Mensal</div>
+                            <div class="result-value" id="economia-mensal">R$ 0,00</div>
+                            <div class="result-label" id="economia-percentual">0%</div>
+                        </div>
+                        
+                        <div class="result-card">
+                            <div class="result-label">Valor da Contribuição</div>
+                            <div class="result-value" id="valor-contribuicao">R$ 0,00</div>
+                            <div class="result-label">(80% da economia bruta)</div>
+                        </div>
+                        
+                        <div class="result-card">
+                            <div class="result-label">Percentual de Rateio</div>
+                            <div class="result-value" id="percentual-rateio">0%</div>
+                            <div class="result-label">na usina de 27.000 kWh</div>
+                        </div>
+                    </div>
+                    
+                    <div class="savings-breakdown">
+                        <h4>Detalhamento Financeiro</h4>
+                        <div class="savings-item">
+                            <span>Conta atual SEM Energia Solar:</span>
+                            <span id="conta-sem-gd">R$ 0,00</span>
+                        </div>
+                        <div class="savings-item">
+                            <span>Nova conta COM Energia Solar:</span>
+                            <span id="conta-com-gd">R$ 0,00</span>
+                        </div>
+                        <div class="savings-item">
+                            <span>Economia Bruta (Cmc - Cgd):</span>
+                            <span id="economia-bruta">R$ 0,00</span>
+                        </div>
+                        <div class="savings-item">
+                            <span>Contribuição para a Associação (80%):</span>
+                            <span id="contribuicao-associacao">R$ 0,00</span>
+                        </div>
+                        <div class="savings-item">
+                            <span><strong>ECONOMIA LÍQUIDA FINAL (20%):</strong></span>
+                            <span id="economia-final">R$ 0,00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="savings-breakdown">
+                        <h4>Estimativa de Consumo</h4>
+                        <div class="savings-item">
+                            <span>Consumo estimado:</span>
+                            <span id="consumo-estimado">0 kWh</span>
+                        </div>
+                        <div class="savings-item">
+                            <span>Valor estimado da CIP:</span>
+                            <span id="valor-cip">R$ 0,00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="comparison-chart">
+                        <h4>Comparação: Com vs Sem Energia Solar</h4>
+                        <div class="chart-bars">
+                            <div class="chart-bar">
+                                <div class="bar bar-sem-gd" id="bar-sem-gd" style="height: 100%"></div>
+                                <div class="bar-label">Sem GD<br><span id="label-sem-gd">R$ 0,00</span></div>
+                            </div>
+                            <div class="chart-bar">
+                                <div class="bar bar-com-gd" id="bar-com-gd" style="height: 80%"></div>
+                                <div class="bar-label">Com GD<br><span id="label-com-gd">R$ 0,00</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-box" style="margin-top: 1.5rem;">
+                        <strong>Relatório Gerado:</strong> Esta simulação considera as tarifas oficiais da Enel CE 
+                        e a fórmula de contribuição da Associação Ibiapaba Solar. Os valores podem variar 
+                        ligeiramente conforme flutuações tarifárias e consumo real.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Associação Ibiapaba Solar • Sítio Bela Vista, s/n, Zona Rural, Tianguá-CE • CEP 62.336-000</p>
+            <p>Calculadora baseada no Estatuto Social e nas tarifas oficiais da Enel CE</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const calcularBtn = document.getElementById('calcular');
+            const resultsDiv = document.getElementById('results');
+            const presetButtons = document.querySelectorAll('.preset-btn');
+            
+            // Tarifas oficiais da Enel CE (baseadas em valores reais)
+            const TARIFA_CATIVO = 0.97272;   // R$/kWh - Mercado Cativo
+            const TARIFA_GD = 0.73925;       // R$/kWh - Geração Distribuída
+            const CAPACIDADE_USINA = 27000;  // kWh/mês
+            
+            // Configurar botões de predefinição
+            presetButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remover classe active de todos os botões
+                    presetButtons.forEach(btn => btn.classList.remove('active'));
+                    // Adicionar classe active ao botão clicado
+                    this.classList.add('active');
+                    
+                    // Preencher o valor da conta
+                    document.getElementById('valor-conta').value = this.getAttribute('data-valor-conta');
+                });
+            });
+            
+            // Calcular economia quando o botão for clicado
+            calcularBtn.addEventListener('click', calcularEconomia);
+            
+            function calcularEconomia() {
+                // Obter valores dos campos
+                const valorConta = parseFloat(document.getElementById('valor-conta').value);
+                const custoDisp = parseFloat(document.getElementById('tipo-ligacao').value);
+                const percentualCIP = parseFloat(document.getElementById('percentual-cip').value);
+                
+                // Validar entradas
+                if (isNaN(valorConta) || valorConta <= 0) {
+                    alert('Por favor, insira um valor válido para a conta de luz.');
+                    return;
+                }
+                
+                // 1. ESTIMAR O CONSUMO A PARTIR DO VALOR DA CONTA
+                
+                // Calcular valor estimado da CIP
+                const valorCIP = valorConta * (percentualCIP / 100);
+                
+                // Calcular valor estimado do consumo (descontando CIP)
+                const valorConsumo = valorConta - valorCIP;
+                
+                // Estimar consumo em kWh (valor do consumo / tarifa)
+                const consumoEstimado = valorConsumo / TARIFA_CATIVO;
+                
+                // 2. CÁLCULOS BASEADOS NA FÓRMULA DO ESTATUTO
+                
+                const percentualRateio = (consumoEstimado / CAPACIDADE_USINA) * 100;
+                
+                // Cálculo da conta sem GD (Cmc) - é o próprio valor informado
+                const cmc = valorConta;
+                
+                // Cálculo do consumo para créditos (descontando o custo de disponibilidade)
+                const consumoCreditos = consumoEstimado - (custoDisp / TARIFA_CATIVO);
+                
+                // Cálculo do valor dos créditos de energia
+                const valorCreditos = consumoCreditos * TARIFA_GD;
+                
+                // Cálculo da conta com GD (Cgd)
+                const cgd = (consumoEstimado * TARIFA_CATIVO) - valorCreditos + valorCIP;
+                
+                // Cálculo da economia bruta
+                const economiaBruta = cmc - cgd;
+                
+                // Cálculo da contribuição para a associação (80% da economia bruta)
+                const contribuicao = economiaBruta * 0.8;
+                
+                // Cálculo da economia real do associado (20% da economia bruta)
+                const economiaReal = economiaBruta * 0.2;
+                
+                // Cálculo da economia percentual
+                const economiaPercentual = (economiaReal / cmc) * 100;
+                
+                // 3. ATUALIZAR A INTERFACE COM OS RESULTADOS
+                
+                document.getElementById('economia-mensal').textContent = formatarMoeda(economiaReal);
+                document.getElementById('economia-percentual').textContent = economiaPercentual.toFixed(1) + '%';
+                document.getElementById('valor-contribuicao').textContent = formatarMoeda(contribuicao);
+                document.getElementById('percentual-rateio').textContent = percentualRateio.toFixed(2) + '%';
+                
+                document.getElementById('conta-sem-gd').textContent = formatarMoeda(cmc);
+                document.getElementById('conta-com-gd').textContent = formatarMoeda(cgd);
+                document.getElementById('economia-bruta').textContent = formatarMoeda(economiaBruta);
+                document.getElementById('contribuicao-associacao').textContent = formatarMoeda(contribuicao);
+                document.getElementById('economia-final').textContent = formatarMoeda(economiaReal);
+                
+                document.getElementById('consumo-estimado').textContent = Math.round(consumoEstimado) + ' kWh';
+                document.getElementById('valor-cip').textContent = formatarMoeda(valorCIP);
+                
+                // Atualizar gráfico de comparação
+                const totalComGD = cgd + contribuicao;
+                const maxValor = Math.max(cmc, totalComGD);
+                const alturaSemGD = 100;
+                const alturaComGD = (totalComGD / maxValor) * 100;
+                
+                document.getElementById('bar-sem-gd').style.height = alturaSemGD + '%';
+                document.getElementById('bar-com-gd').style.height = alturaComGD + '%';
+                
+                document.getElementById('label-sem-gd').textContent = formatarMoeda(cmc);
+                document.getElementById('label-com-gd').textContent = formatarMoeda(totalComGD);
+                
+                // Mostrar resultados
+                resultsDiv.classList.add('active');
+                
+                // Rolagem suave para os resultados
+                resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            
+            function formatarMoeda(valor) {
+                return 'R$ ' + valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+            
+            // Calcular automaticamente ao carregar a página
+            calcularEconomia();
+        });
+    </script>
+</body>
+</html>
